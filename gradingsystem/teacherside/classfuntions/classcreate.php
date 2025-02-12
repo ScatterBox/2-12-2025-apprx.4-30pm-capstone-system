@@ -7,6 +7,11 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'teacher') {
 
 $loggedInUserId = $_SESSION['user']['user_id']; // Get the teacher's user ID
 
+// Fetch user details
+$userImg = !empty($_SESSION['user']['img']) ? '../uploads/' . htmlspecialchars($_SESSION['user']['img']) : '../images/default-profile.jpg';
+$userNickname = htmlspecialchars($_SESSION['user']['nickname'] ?? 'Admin');
+
+
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -170,16 +175,14 @@ $conn->close();
                     </a>
                 </li>
             </ul>
-            <a href="profile.php" class="user-account-link">
+            <a href="../teacherprofile.php" class="user-account-link">
                 <div class="user-account">
                     <div class="user-profile">
-                        <?php
-                        $userImg = !empty($_SESSION['user']['img']) ? '../images/' . $_SESSION['user']['img'] : '../images/placeholder.png';
-                        ?>
-                        <img src="<?php echo $userImg; ?>" alt="Profile Image" />
+                        <img src="<?php echo '../../uploads/' . htmlspecialchars($_SESSION['user']['img']) . '?' . time(); ?>"
+                            alt="Profile Image" />
                         <div class="user-detail">
-                            <h3><?php echo $_SESSION['user']['nickname']; ?></h3>
-                            <span>Profile</span>
+                            <h3><?php echo htmlspecialchars($_SESSION['user']['nickname']); ?></h3>
+                            <span>Teacher's Profile</span>
                         </div>
                     </div>
                 </div>

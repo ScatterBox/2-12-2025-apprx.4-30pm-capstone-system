@@ -20,13 +20,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $student_id = isset($_POST['user_id']) ? intval($_POST['user_id']) : 0;
     $subject_id = isset($_POST['subject_id']) ? intval($_POST['subject_id']) : 0;
     $category = isset($_POST['category']) ? $_POST['category'] : '';
+    $name = isset($_POST['name']) ? trim($_POST['name']) : ''; // Graded activity name
     $score = isset($_POST['score']) ? intval($_POST['score']) : 0;
     $total_marks = isset($_POST['total_marks']) ? intval($_POST['total_marks']) : 0;
     $teacher_id = $_SESSION['user_id']; // Logged-in teacher ID
     $date = date('Y-m-d'); // Auto-generate the date
 
     // Validate input
-    if ($student_id == 0 || $subject_id == 0 || empty($category) || $score < 0 || $total_marks <= 0) {
+    if ($student_id == 0 || $subject_id == 0 || empty($category) || empty($name) || $score < 0 || $total_marks <= 0) {
         echo "<script>
                 alert('Invalid input! Please ensure all fields are filled correctly.');
                 window.history.back();
@@ -37,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Ensure correct table names
     if ($category === "performance_tasks") {
         $table_name = "performance_tasks";
-    } elseif ($category === "quarterly_assessments") {
+    } elseif ($category === "quarterly_assessment") {
         $table_name = "quarterly_assessment"; // ✅ Corrected table name
     } elseif ($category === "written_works") {
         $table_name = "written_works";
@@ -49,10 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    // Insert the grade into the correct table
-    $sql = "INSERT INTO $table_name (name, total_score, date, subject_id) VALUES (?, ?, ?, ?)";
+    // Insert the grade into the correct table (INCLUDING total_marks)
+    $sql = "INSERT INTO $table_name (name, total_score, total_marks, date, subject_id) VALUES (?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sisi", $category, $total_marks, $date, $subject_id);
+    $stmt->bind_param("siisi", $name, $score, $total_marks, $date, $subject_id);
 
     if ($stmt->execute()) {
         echo "<script>

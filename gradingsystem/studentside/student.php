@@ -1,14 +1,9 @@
 <?php
 session_start();
-if ($_SESSION['role'] !== 'teacher') {
+if ($_SESSION['role'] !== 'student') {
     header("Location: ../login.php");
     exit();
 }
-
-// Fetch user details
-$userImg = !empty($_SESSION['user']['img']) ? '../uploads/' . htmlspecialchars($_SESSION['user']['img']) : '../images/default-profile.jpg';
-$userNickname = htmlspecialchars($_SESSION['user']['nickname'] ?? 'Admin');
-
 ?>
 
 <?php include '../styles/hui.php' ?>
@@ -22,6 +17,9 @@ $userNickname = htmlspecialchars($_SESSION['user']['nickname'] ?? 'Admin');
 <link href="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.0.8/datatables.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<link rel="icon" type="image/png" href="../images/logo.jpg">
+
+
 
 <body>
     <div class="container-fluid">
@@ -30,8 +28,8 @@ $userNickname = htmlspecialchars($_SESSION['user']['nickname'] ?? 'Admin');
                 <img src="../images/logo.jpg" alt="logo" />
                 <div class="header-text">
                     <h2 class="dashboard-title">
-                        <a href="teacher.php" class="dashboard-link">
-                            <span class="admin-text">Teacher</span>
+                        <a href="admin.php" class="dashboard-link">
+                            <span class="admin-text">Student</span>
                             <span class="dashboard-text">Dashboard</span>
                         </a>
                     </h2>
@@ -39,18 +37,13 @@ $userNickname = htmlspecialchars($_SESSION['user']['nickname'] ?? 'Admin');
             </div>
             <ul class="sidebar-links">
                 <li>
-                    <a href="classfuntions/classcreate.php">
-                        <i class="fa-solid fa-chalkboard"></i> Create Class
+                    <a href="teacherfunctions/displayteachers.php">
+                        <i class="fa-solid fa-book"></i> My Subjects
                     </a>
                 </li>
                 <li>
-                    <a href="classfuntions/classlist.php">
-                        <i class="fa-solid fa-book"></i> Subjects List
-                    </a>
-                </li>
-                <li>
-                    <a href="classfuntions/mystudents.php">
-                        <i class="fa-solid fa-user-graduate"></i> My Students
+                    <a href="adminfunctions/displayadmins.php">
+                        <i class="fa-solid fa-file-alt"></i> My Records
                     </a>
                 </li>
 
@@ -59,21 +52,21 @@ $userNickname = htmlspecialchars($_SESSION['user']['nickname'] ?? 'Admin');
                     <div class="menu-separator"></div>
                 </h4>
                 <li>
-                    <a href="../logout.php" onclick="confirmLogout(event)">
-                        <span class="material-symbols-outlined">logout</span>Logout
+                    <a href="../logout.php" id="logoutLink">
+                        <span class="material-symbols-outlined">logout</span> Logout
                     </a>
 
                 </li>
 
             </ul>
-            <a href="teacherprofile.php" class="user-account-link">
+            <a href="studentprofile.php" class="user-account-link">
                 <div class="user-account">
                     <div class="user-profile">
-                        <img src="<?php echo '../uploads/' . htmlspecialchars($_SESSION['user']['img']) . '?' . time(); ?>"
+                        <img src="<?php echo '../uploads/' . htmlspecialchars($_SESSION['user']['img']); ?>"
                             alt="Profile Image" />
                         <div class="user-detail">
                             <h3><?php echo htmlspecialchars($_SESSION['user']['nickname']); ?></h3>
-                            <span>Teacher's Profile</span>
+                            <span>Student's Profile</span>
                         </div>
                     </div>
                 </div>
@@ -87,11 +80,29 @@ $userNickname = htmlspecialchars($_SESSION['user']['nickname'] ?? 'Admin');
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.getElementById("logoutLink").addEventListener("click", function (event) {
+            event.preventDefault(); // Prevent default link action
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You will be logged out of your account!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, log me out!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "../logout.php"; // Redirect to logout
+                }
+            });
+        });
+    </script>
     <script src="../scripts/checkSession.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.0.8/datatables.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 </body>
 
 </html>

@@ -1,6 +1,6 @@
-<?php
+<?php 
 session_start();
-if ($_SESSION['role'] !== 'teacher') {
+if ($_SESSION['role'] !== 'student') {
     header("Location: ../login.php");
     exit();
 }
@@ -9,8 +9,8 @@ include '../conn.php'; // Include the database connection
 
 $user_id = $_SESSION['user']['user_id'];
 
-// Fetch teacher data
-$query = "SELECT user_id, bio, img, email FROM teachers WHERE user_id = ?";
+// Fetch student data
+$query = "SELECT user_id, bio, img, email FROM students WHERE user_id = ?";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -34,11 +34,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_img'])) {
     }
 
     $imageFileType = strtolower(pathinfo($_FILES["profile_img"]["name"], PATHINFO_EXTENSION));
-    $new_filename = "teacher_{$user_id}_" . time() . "." . $imageFileType;
+    $new_filename = "student_{$user_id}_" . time() . "." . $imageFileType;
     $target_file = $target_dir . $new_filename;
 
     if (in_array($imageFileType, ['jpg', 'jpeg', 'png']) && move_uploaded_file($_FILES["profile_img"]["tmp_name"], $target_file)) {
-        $sql = "UPDATE teachers SET img = ? WHERE user_id = ?";
+        $sql = "UPDATE students SET img = ? WHERE user_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("si", $new_filename, $user_id);
 
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_username'])) {
     $new_username = trim($_POST['new_username']);
 
     if (!empty($new_username)) {
-        $sql = "UPDATE teachers SET username = ? WHERE user_id = ?";
+        $sql = "UPDATE students SET username = ? WHERE user_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("si", $new_username, $user_id);
 
@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_username'])) {
 // Handle bio change
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_bio'])) {
     $new_bio = trim($_POST['new_bio']);
-    $sql = "UPDATE teachers SET bio = ? WHERE user_id = ?";
+    $sql = "UPDATE students SET bio = ? WHERE user_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("si", $new_bio, $user_id);
 
@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_email'])) {
     $new_email = trim($_POST['new_email']);
 
     if (!empty($new_email)) {
-        $sql = "UPDATE teachers SET email = ? WHERE user_id = ?";
+        $sql = "UPDATE students SET email = ? WHERE user_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("si", $new_email, $user_id);
 
@@ -116,13 +116,14 @@ if (!file_exists(dirname(__FILE__) . '/../uploads/' . basename($userImg))) {
     $userImg = '../images/default-profile.jpg';
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Teacher Profile</title>
+    <title>Admin Profile</title>
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
@@ -133,6 +134,8 @@ if (!file_exists(dirname(__FILE__) . '/../uploads/' . basename($userImg))) {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="icon" type="image/png" href="../images/logo.jpg">
+
+
 </head>
 
 <body>
@@ -142,8 +145,8 @@ if (!file_exists(dirname(__FILE__) . '/../uploads/' . basename($userImg))) {
                 <img src="../images/logo.jpg" alt="logo" />
                 <div class="header-text">
                     <h2 class="dashboard-title">
-                        <a href="teacher.php" class="dashboard-link">
-                            <span class="admin-text">Teacher</span>
+                        <a href="student.php" class="dashboard-link">
+                            <span class="admin-text">Student</span>
                             <span class="dashboard-text">Dashboard</span>
                         </a>
                     </h2>
@@ -151,20 +154,16 @@ if (!file_exists(dirname(__FILE__) . '/../uploads/' . basename($userImg))) {
             </div>
             <ul class="sidebar-links">
                 <li>
-                    <a href="classfuntions/classcreate.php">
-                        <i class="fa-solid fa-chalkboard"></i> Create Class
+                    <a href="teacherfunctions/displayteachers.php">
+                        <i class="fa-solid fa-book"></i> My Subjects
                     </a>
                 </li>
                 <li>
-                    <a href="classfuntions/classlist.php">
-                        <i class="fa-solid fa-book"></i> Subjects List
+                    <a href="adminfunctions/displayadmins.php">
+                        <i class="fa-solid fa-file-alt"></i> My Records
                     </a>
                 </li>
-                <li>
-                    <a href="classfuntions/mystudents.php">
-                        <i class="fa-solid fa-user-graduate"></i> My Students
-                    </a>
-                </li>
+
 
                 <h4>
                     <span>Account</span>
@@ -176,14 +175,14 @@ if (!file_exists(dirname(__FILE__) . '/../uploads/' . basename($userImg))) {
                     </a>
                 </li>
             </ul>
-            <a href="teacherprofile.php" class="user-account-link">
+            <a href="studentprofile.php" class="user-account-link">
                 <div class="user-account">
                     <div class="user-profile">
                         <img src="<?php echo '../uploads/' . htmlspecialchars($_SESSION['user']['img']) . '?' . time(); ?>"
                             alt="Profile Image" />
                         <div class="user-detail">
                             <h3><?php echo htmlspecialchars($_SESSION['user']['nickname']); ?></h3>
-                            <span>Teacher's Profile</span>
+                            <span>Admin's Profile</span>
                         </div>
                     </div>
                 </div>

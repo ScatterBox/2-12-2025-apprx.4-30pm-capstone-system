@@ -5,6 +5,11 @@ if ($_SESSION['role'] !== 'teacher') {
     exit();
 }
 
+// Fetch user details
+$userImg = !empty($_SESSION['user']['img']) ? '../uploads/' . htmlspecialchars($_SESSION['user']['img']) : '../images/default-profile.jpg';
+$userNickname = htmlspecialchars($_SESSION['user']['nickname'] ?? 'Admin');
+
+
 $host = 'localhost';
 $username = 'root';
 $password = '';
@@ -118,16 +123,14 @@ $conn->close();
                 </li>
 
             </ul>
-            <a href="profile.html" class="user-account-link">
+            <a href="../teacherprofile.php" class="user-account-link">
                 <div class="user-account">
                     <div class="user-profile">
-                        <?php
-                        $userImg = !empty($_SESSION['user']['img']) ? '../images/' . $_SESSION['user']['img'] : '../images/placeholder.png';
-                        ?>
-                        <img src="<?php echo $userImg; ?>" alt="Profile Image" />
+                        <img src="<?php echo '../../uploads/' . htmlspecialchars($_SESSION['user']['img']) . '?' . time(); ?>"
+                            alt="Profile Image" />
                         <div class="user-detail">
-                            <h3><?php echo $_SESSION['user']['nickname']; ?></h3>
-                            <span>Profile</span>
+                            <h3><?php echo htmlspecialchars($_SESSION['user']['nickname']); ?></h3>
+                            <span>Teacher's Profile</span>
                         </div>
                     </div>
                 </div>
@@ -173,6 +176,11 @@ $conn->close();
                         <option value="quarterly_assessments">Quarterly Assessment</option>
                         <option value="written_works">Written Works</option>
                     </select>
+                </div>
+
+                <div class="mb-3">
+                <label for="name" class="form-label">Graded Activity Name</label>
+                <input type="text" name="name" id="name" class="form-control" required>
                 </div>
 
                 <!-- Score Input -->
